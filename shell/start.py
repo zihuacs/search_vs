@@ -2,11 +2,12 @@
 #---------------------------------------------------------------------
 # Copyright (c) 2013 zihuacs, Inc. All Rights Reserved
 #
-# @date 2013-01-15, 20:46:00 
-# @file test.py
+# @date 2013-01-15, 13:47:00 
+# @file start.py
 # @author zihuacs(zihuacs@qq.com)
-# @brief just for test
+# @brief 入口脚本
 #--------------------------------------------------------------------- 
+
 from proc_init import *
 proc_init()
 
@@ -28,3 +29,5 @@ def main():
 
 if __name__ =='__main__':
 	main()
+
+	
