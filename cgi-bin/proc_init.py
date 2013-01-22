@@ -12,9 +12,9 @@ import sys
 import os
 
 def proc_init():
-    project_dir = os.path.abspath('../')
+    project_dir = os.path.abspath('D:\GitHub\search_vs')
     sys.path.append(project_dir)
     py_dir = project_dir + os.path.sep + 'conf' + os.path.sep
     sys.path.append(py_dir)
-    py_dir = project_dir + os.path.sep + 'shell' + os.path.sep
+    py_dir = project_dir + os.path.sep + 'cgi-bin' + os.path.sep
     sys.path.append(py_dir)

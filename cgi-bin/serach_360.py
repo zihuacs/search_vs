@@ -8,8 +8,10 @@
 # @brief 抓取360音乐歌曲检索首页结果，非首页忽略之--->1ting,kuwo,kugou,xiami
 #--------------------------------------------------------------------- 
 import urllib2
+import time
 from bs4 import BeautifulSoup
 from song_info import *
+from urllib import quote
 
 # 360各标签map
 TAB_NAME_360MAP={
@@ -39,8 +41,15 @@ class Search360:
 	临时变量初始化 --- 在查找song_info 中使用
 	'''
 	def temp_init(self):
-		self.result={}
-		self.result['high']={}
+		self.result         ={'title':'','artist':'','album':'','high':{},'link':{}}
+		self.result['high'] ={'title':[],'artist':[],'album':[]}
+		self.result['link'] ={'title':'','artist':'','album':''}
+
+	'''
+	return self.song_info
+	'''
+	def get_song_info(self):
+		return self.song_info
 
 	'''
 	just for test 
@@ -63,6 +72,14 @@ class Search360:
 				high_list.append(high_word.strip())
 		return high_list
 	'''
+	360的仅需直接返回即可，无需类似b一样拼接
+	'''
+	def get_link(self,tag):
+		_a_link = tag.attrs['href'].encode('utf-8')
+		return _a_link
+
+
+	'''
 	tag: soup处理的当前标签，从合适的tag中抽取num、title、artist、album、high
 	封装到result里
 	result={'title':'...','artist':'...','album':'...','high':{'title':[],'artist':[],'album':[]}}
@@ -80,17 +97,23 @@ class Search360:
 		   tag.has_key('target') and tag.has_key('title') and tag['target'] in ['360Play','_blank'] :
 
 			_high_list = self.get_high_list(tag.find_all('em'))
+			_a_link    = self.get_link(tag)
 			if tag.parent['class'] == ['title'] :
 				self.result['title']=tag['title'].encode('utf-8')
 				self.result['high']['title'] = _high_list 
+				self.result['link']['title'] = _a_link
+				return True
 
 			if tag.parent['class'] == ['artist'] :
 				self.result['artist']=tag['title'].encode('utf-8')
 				self.result['high']['artist'] = _high_list 
+				self.result['link']['artist'] = _a_link
+				return True
 
 			if tag.parent['class'] == ['album'] :
 				self.result['album']=tag['title'].encode('utf-8')
 				self.result['high']['album'] = _high_list
+				self.result['link']['album'] = _a_link
 
 				# 加入一条结果
 				self.song_info.append_result(self.result)
@@ -110,21 +133,34 @@ class Search360:
 	'''
 	def start(self,qword):
 		# 拼接url
-		search_url = self.url % (qword,self.type)
-		# 下载之
+		search_url = self.url % (quote(qword),self.type)
+		# 下载之 
+		begin_time = time.time()
 		content = urllib2.urlopen(search_url).read()
+		end_time = time.time()
+		# 时间之
+		self.song_info.set_proc_time(float(end_time - begin_time))
 		# soup对象
 		soup = BeautifulSoup(content)
 		# 清空song_info
 		self.song_info.clear()
 		# 寻址之
+		self.song_info.set_search_url(search_url)
 		soup.find_all(self.find_song_info)
-		# 显示之
-		self.show()
 
+'''
+根据url and word return song_info
+'''
+def get_search_360_res(url,qword,qtype):
+	S3 = Search360(url,qtype)
+	S3.start(qword)
+	s360_song_info = S3.get_song_info()
+	return s360_song_info
 
 def test_360(url,qword,qtype):
 	S3 = Search360(url,qtype)
 	S3.start(qword)
+	S3.show()
 
 #test_360('http://s.music.so.com/s?q=%s&c=%s','因为爱情','kuwo')
+#get_search_360_res('http://s.music.so.com/s?q=%s&c=%s','因为爱情','kuwo')

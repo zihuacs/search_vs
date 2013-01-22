@@ -8,8 +8,10 @@
 # @brief 抓取百度音乐歌曲检索首页结果，非首页忽略之
 #--------------------------------------------------------------------- 
 import urllib2
+import time
 from bs4 import BeautifulSoup
 from song_info import *
+from urllib import quote
 
 class SearchBadiu:
 	'''
@@ -24,15 +26,26 @@ class SearchBadiu:
 	临时变量初始化 --- 在查找song_info 中使用
 	'''
 	def temp_init(self):
-		self.all_num=0
-		self.result={}
-		self.result['high']={}
+		self.all_num        =0
+		self.result         ={'title':'','artist':'','album':'','high':{},'link':{}}
+		self.result['high'] ={'title':[],'artist':[],'album':[]}
+		self.result['link'] ={'title':'','artist':'','album':''}
+		self.a_link         = ''
+
+	'''
+	return self.song_info
+	'''
+	def get_song_info(self):
+		return self.song_info
 
 	'''
 	just for test 
 	'''
 	def find_a(self,tag):
-		if tag.name == 'a':
+		if tag.name == 'a' and tag.has_key('href'):
+
+			if self.a_link == '':
+				self.a_link = tag.attrs['href'].encode('utf-8')
 			return True
 		return False
 
@@ -48,6 +61,14 @@ class SearchBadiu:
 			if not high_word.strip() in high_list:
 				high_list.append(high_word.strip())
 		return high_list
+	'''
+	get a link
+	'''
+	def get_link(self,tag):
+		tag.find(self.find_a)
+		_a_link     = self.a_link
+		self.a_link = ''
+		return "http://music.baidu.com"+_a_link.strip('')
 	'''
 	tag: soup处理的当前标签，从合适的tag中抽取num、title、artist、album、high
 	封装到result里
@@ -65,21 +86,26 @@ class SearchBadiu:
 
 		if tag.name == 'span' and tag.has_key('class') and tag.has_key('style') and \
 		   tag['class'] in [['song-title'],['singer'],['album-title']]:
-			
 			_string    = tag.get_text().encode('utf-8').strip().replace('\n',' ')
 			_high_list = self.get_high_list(tag.find_all('em'))
-
+			_a_link    = self.get_link(tag)
 			if tag['class'] == ['song-title']:
-				self.result['title']          = _string.strip().split(' ')[0]
+				if tag.a != None:
+					_string = tag.a.get_text().encode('utf-8').strip().replace('\n',' ')
+				self.result['title']          = _string.strip()
 				self.result['high']['title']  = _high_list
+				self.result['link']['title']  = _a_link
 				return True
 			if tag['class'] == ['singer']:
 				self.result['artist']         = _string.replace('/',',').replace('\t',' ').replace(' ','')
 				self.result['high']['artist'] = _high_list
+				self.result['link']['artist']  = _a_link
+
 				return True
 			if tag['class'] == ['album-title']:
 				self.result['album']          = _string.replace("《",' ').replace("》",' ').strip()
 				self.result['high']['album']  = _high_list	
+				self.result['link']['album']  = _a_link
 				# 加入一条结果
 				self.song_info.append_result(self.result)
 				# 清空临时变量
@@ -97,20 +123,35 @@ class SearchBadiu:
 	'''
 	def start(self,qword):
 		# 拼接url
-		search_url = self.url % qword
+		search_url = self.url % quote(qword)
 		# 下载之
+		begin_time = time.time()
 		content = urllib2.urlopen(search_url).read()
+		end_time = time.time()
+		# 时间之
+		self.song_info.set_proc_time(float(end_time - begin_time))
 		# soup对象
 		soup = BeautifulSoup(content)
 		# 清空song_info
 		self.song_info.clear()
 		# 寻址之
+		self.song_info.set_search_url( search_url )
 		soup.find_all(self.find_song_info)
-		# 显示之
-		self.show()
+
+'''
+根据url and word return song_info
+'''
+def get_search_baidu_res(url,word):
+	SB = SearchBadiu(url)
+	SB.start(word)
+	badiu_song_info = SB.get_song_info()
+	return badiu_song_info
 
 def test_baidu(url,word):
 	SB = SearchBadiu(url)
 	SB.start(word)
+	SB.show()
 
-#test_baidu('http://music.baidu.com/search/song?key=%s','我的歌声')
+
+#test_baidu('http://music.baidu.com/search/song?key=%s','我的歌声里')
+#get_search_baidu_res('http://music.baidu.com/search/song?key=%s','即刻出发')

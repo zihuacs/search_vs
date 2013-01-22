@@ -13,7 +13,7 @@ import mylogger
 
 #路径配置
 #------------目录级别的--------------#
-ROOT_DIR = os.path.abspath('../')
+ROOT_DIR = os.path.abspath('D:\GitHub\search_vs')
 # 配置
 CONF_DIR = ROOT_DIR + os.path.sep + 'conf'
 if not os.path.isdir(CONF_DIR):
@@ -30,6 +30,11 @@ if not os.path.isdir(DOC_DIR):
 SHELL_DIR = ROOT_DIR + os.path.sep + 'shell'
 if not os.path.isdir(SHELL_DIR):
     os.mkdir(SHELL_DIR)
+# 样式CSS
+CSS_DIR = ROOT_DIR + os.path.sep + 'css'
+if not os.path.isdir(SHELL_DIR):
+    os.mkdir(SHELL_DIR)
+
 # 日志
 LOG_DIR = ROOT_DIR + os.path.sep + 'log'
 if not os.path.isdir(LOG_DIR):
@@ -41,6 +46,8 @@ SEARCH_360_URL   = "http://s.music.so.com/s?q=%s&c=%s"
 #-----------变量相关----------------#
 
 #-----------文件相关----------------#
+#index.css
+INDEX_CSS = CSS_DIR + os.path.sep + 'index.css'
 
 #Log
 LOG_PATH = LOG_DIR + os.path.sep + 'search_vs'
