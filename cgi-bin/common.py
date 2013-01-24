@@ -10,9 +10,9 @@
 from song_info import *
 from conf import *
 '''
-搜索框 post请求
+搜索框功能框 post请求
 '''
-def show_search_box(qword=''):
+def show_search_box(qword='',type_list=[],select_type_list=[],func_list=[],func_open_item=''):
 	print '''
 	<br>
 	<br>
@@ -22,13 +22,31 @@ def show_search_box(qword=''):
 	search_vs_box
 	<br>
 	'''
+	
 	print "<input type=text name=qword size=50 value=\"%s\" >" % qword 
+	print '<br>'
+
+	for qtype in type_list:
+		print qtype
+		if qtype in select_type_list:
+			print "<input type=\"checkbox\" checked=\"checked\" name=%s>" % qtype
+		else:
+			print "<input type=\"checkbox\"  name=%s>" % qtype
+
+	print '<br>'
+
+	for qfunc in func_list:
+		print qfunc
+		if qfunc == func_open_item:
+			print "<input type=\"radio\" checked=\"checked\" name=\"func\" value=%s>" % qfunc
+		else:
+			print "<input type=\"radio\" name=\"func\" value=%s>" % qfunc
+	print '<br>'
 	print '''
-	 <input type=submit value="music">
+	<input type=submit value="music">
 	</caption>
 	</table>
 	</form>
-	<br>
 	'''
 
 '''
@@ -55,7 +73,7 @@ def print_index_style(index_css_path):
 	print '</style>'
 
 '''
-对 show_str 无法 ... 代之，否则 丑
+对 show_str  ... 代之，否则 丑
 飘红词 em 之
 '''
 def high_and_link_str(show_str,high_list,a_link):
@@ -70,14 +88,19 @@ def high_and_link_str(show_str,high_list,a_link):
 '''
 show one song_info_table
 '''
-def show_song_info_table(song_info,qword):
-	print '''
-	<table id="mytable" cellspacing="0" align="center" width="700px"> 
-	<caption>'''
+def show_song_info_table(song_info,qword,post_info):
+
+	print '''<table id="mytable" cellspacing="0" align="center" width="700px">'''
+	# mao tag
+	print "<a name=\"%s\"></a>" % song_info.get_src_type() 
+	for qtype in post_info['select_type_list']:
+		print "<a href=\"#%s\">%s </a>" % (qtype,qtype)
+
+	print '<caption>'
 	print "<a href=\"%s\" target=\"view_window\"> %s_music</a> num:%d time:%f" % (song_info.get_search_url() ,song_info.get_src_type(),song_info.get_all_num(),song_info.get_proc_time())
-	
+	print '</caption>'
+
 	print '''
-	</caption> 
 	<tr> 
 	<th scope="col" >歌曲</th> 
 	<th scope="col" >歌手</th> 
@@ -109,12 +132,15 @@ def show_song_info_table(song_info,qword):
 '''
 body.print
 '''
-def show_song_info_list_body(song_info_list,qword):
+def show_song_info_list_body(song_info_list,post_info):
 	print '<body>'
 	print '<div class="main_content">'
-	show_search_box(qword)
+	# 搜索框
+	qword=post_info['qword']
+	show_search_box(qword,TYPE_LIST,post_info['select_type_list'],["sug_close","sug_open"],post_info['select_func'])
+
 	for song_info in song_info_list:
-		show_song_info_table(song_info,qword)
+		show_song_info_table(song_info,qword,post_info)
 
 	print '</div>'
 	print '</body>'
@@ -123,12 +149,12 @@ def show_song_info_list_body(song_info_list,qword):
 index_css_path : css 样式
 song_info_list : [baidu_res,360_res] 
 '''
-def show_song_info_list_html(index_css_path,song_info_list,qword):
+def show_song_info_list_html(index_css_path,song_info_list,post_info):
 	print '''<html><head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>music_search bettern than rd!</title>'''
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><title>music_search better than rd!</title>'''
 	print_index_style(index_css_path)
 	print '''</head>'''
 
-	show_song_info_list_body(song_info_list,qword)
+	show_song_info_list_body(song_info_list,post_info)
 	
 	print '</html>'

@@ -44,7 +44,7 @@ if not os.path.isdir(LOG_DIR):
 SEARCH_BAIDU_URL = "http://music.baidu.com/search/song?key=%s"
 SEARCH_360_URL   = "http://s.music.so.com/s?q=%s&c=%s"
 #-----------变量相关----------------#
-
+TYPE_LIST = ['baidu','kuwo','xiami','kugou','1ting']
 #-----------文件相关----------------#
 #index.css
 INDEX_CSS = CSS_DIR + os.path.sep + 'index.css'

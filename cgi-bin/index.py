@@ -35,9 +35,11 @@ def get_song_info(song_info_list,qword,qtype):
 '''
 以多线程的方式获取结果,并以type_list 进行重排序
 '''
-def mult_get_song_info_list(song_info_list,qword):
+def mult_get_song_info_list(song_info_list,post_info):
+	qword = post_info['qword']
+
 	threads=[]
-	type_list = ['baidu','kuwo','xiami','kugou','1ting']
+	type_list = post_info['select_type_list']
 	for qtype in type_list:
 		t = threading.Thread(target=get_song_info, args=(song_info_list,qword,qtype))
 		threads.append(t)
@@ -56,18 +58,22 @@ def mult_get_song_info_list(song_info_list,qword):
 '''
 从baidu、360汇聚结果
 '''
-def show_search_res(qword):
+def show_search_res(post_info):
+	qword = post_info['qword']
 	song_info_list=[]
 	# 无query，show box 之
 	if qword=='':
 		# 伪造 空 结果
-		song_info_list.append(SongInfo('baidu'))
-		song_info_list.append(SongInfo('1ting'))
-		song_info_list.append(SongInfo('xiami'))
-		song_info_list.append(SongInfo('kuwo'))
-		song_info_list.append(SongInfo('kugou'))
+		for qtype in post_info['select_type_list']:
+			song_info_list.append(SongInfo(qtype))
 
-		show_song_info_list_html(INDEX_CSS,song_info_list,qword)
+		# song_info_list.append(SongInfo('baidu'))
+		# song_info_list.append(SongInfo('1ting'))
+		# song_info_list.append(SongInfo('xiami'))
+		# song_info_list.append(SongInfo('kuwo'))
+		# song_info_list.append(SongInfo('kugou'))
+
+		show_song_info_list_html(INDEX_CSS,song_info_list,post_info)
 		return True
 	# 向 3B 发起检索
 	# B 检索
@@ -79,23 +85,44 @@ def show_search_res(qword):
 	# 	song_info_list.append(s360_song_info)
 	
 	# 多线程抽取结果
-	mult_get_song_info_list(song_info_list,qword)
+	mult_get_song_info_list(song_info_list,post_info)
 	# 评测之
-	pingce_fun(song_info_list)
+	if post_info['select_func'] == 'sug_open':
+		if 'baidu' in post_info['select_type_list'] and len(post_info['select_type_list'])>1:
+			pingce_fun(song_info_list)
+		else:
+			print "选择baidu和其他至少一项才能给出建议...<br>"
 
 	# # show 3B 结果
-	show_song_info_list_html(INDEX_CSS,song_info_list,qword)
+	show_song_info_list_html(INDEX_CSS,song_info_list,post_info)
 	return True
 '''
 从搜索框提取query
 '''
-def get_query_word():
+def get_post_info():
 	form=cgi.FieldStorage()
+
 	if form.has_key('qword'):
 		qword = form['qword'].value
 	else:
 		qword = '因为爱情'
-	return qword.strip()
+
+	select_type_list=[]
+	for qtype in TYPE_LIST:
+		if form.has_key(qtype) and form[qtype].value == 'on':
+			select_type_list.append(qtype)
+			
+	if select_type_list == []:
+		print "没有选择任何一项，默认为你选择百度...<br>"
+		select_type_list.append('baidu')
+
+	select_func =''
+	if form.has_key('func'):
+		select_func = form['func'].value
+	if select_func == '':
+		select_func = 'sug_close'
+
+	return {'qword':qword.strip(),"select_type_list":select_type_list,'select_func':select_func}
 
 '''
 主函数入口
@@ -104,8 +131,8 @@ def main():
 	# 此语句不可少之
 	print "Content-type: text/html; charset='UTF-8'\n\n"
 
-	qword = get_query_word()
-	show_search_res(qword)
+	post_info = get_post_info()
+	show_search_res(post_info)
 
 
 if __name__ =='__main__':

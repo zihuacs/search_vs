@@ -162,16 +162,15 @@ def search_vs(baidu_song_info, other_song_info):
 				else:
 					baidu_song_info.results[i_item[0]]['down'] = baidu_song_info.results[i_item[0]]['down'] + 1 
 
-				 
-
 '''
 评测入口程序
 '''
 def pingce_fun(song_info_list):
 	baidu_song_info = get_baidu_song_info(song_info_list)
-	type_list = ['kuwo','xiami','kugou','1ting']
-	for i in range(1,len(song_info_list)):
-		search_vs(baidu_song_info,song_info_list[i])
+	for other_song_info in song_info_list:
+		if other_song_info.get_src_type() == 'baidu':
+			continue
+		search_vs(baidu_song_info,other_song_info)
 
-print minimum_edit_distance(" 你是我的眼0 我的歌声里".decode('UTF-8'),"我的歌声里 你是我的眼0".decode('UTF-8'))
-print str_proc('我的歌声...')
+#print minimum_edit_distance(" 你是我的眼0 我的歌声里".decode('UTF-8'),"我的歌声里 你是我的眼0".decode('UTF-8'))
+#print str_proc('我的歌声...')
