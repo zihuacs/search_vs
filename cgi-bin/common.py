@@ -88,9 +88,22 @@ def show_song_info_table(song_info,qword):
 		print '<tr>' + \
 		'<td class="row" width="250px">' + high_and_link_str( item['title'],item['high']['title'],item['link']['title'] )  + '</td>' + \
 		'<td class="row" width="150px">' + high_and_link_str( item['artist'],item['high']['artist'],item['link']['artist'] ) + '</td>' + \
-		'<td class="row" width="200px">' + high_and_link_str( item['album'],item['high']['album'],item['link']['album'] )  + '</td>' + \
-		'<td class="row" >' + '->'           + '</td>' + \
-	    '</tr>'
+		'<td class="row" width="200px">' + high_and_link_str( item['album'],item['high']['album'],item['link']['album'] )  + '</td>'
+
+		up,down = 0,0
+		if item.has_key('up'):
+			up = item['up']
+		if item.has_key('down'):
+			down = item['down']
+
+		if up == down:
+			sug_str ='→'
+		if up > down:
+			sug_str = '↑'
+		if up < down:
+			sug_str = '↓'
+
+		print '<td class="row" >' + sug_str           + '</td>' + '</tr>'
 	print '</table>'
 
 '''

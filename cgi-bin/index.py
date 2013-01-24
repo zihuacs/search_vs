@@ -18,6 +18,7 @@ from search_baidu import *
 from serach_360 import *
 from common import *
 from song_info import *
+from pingce import pingce_fun
 
 import threading
 
@@ -32,7 +33,7 @@ def get_song_info(song_info_list,qword,qtype):
 
 
 '''
-以多线程的方式获取结果
+以多线程的方式获取结果,并以type_list 进行重排序
 '''
 def mult_get_song_info_list(song_info_list,qword):
 	threads=[]
@@ -45,7 +46,7 @@ def mult_get_song_info_list(song_info_list,qword):
 		threads[i].start()
 	for i in range(len(type_list)):
 		threads[i].join()
-
+	# 重排序之
 	for qtype in type_list:
 		for song_info in song_info_list:
 			if song_info.get_src_type() == qtype:
@@ -77,7 +78,11 @@ def show_search_res(qword):
 	# 	s360_song_info = get_search_360_res(SEARCH_360_URL,qword,qtype)
 	# 	song_info_list.append(s360_song_info)
 	
+	# 多线程抽取结果
 	mult_get_song_info_list(song_info_list,qword)
+	# 评测之
+	pingce_fun(song_info_list)
+
 	# # show 3B 结果
 	show_song_info_list_html(INDEX_CSS,song_info_list,qword)
 	return True
