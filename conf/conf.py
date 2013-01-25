@@ -41,10 +41,14 @@ if not os.path.isdir(LOG_DIR):
     os.mkdir(LOG_DIR)
 
 #-----------下载相关----------------#
-SEARCH_BAIDU_URL = "http://music.baidu.com/search/song?key=%s"
-SEARCH_360_URL   = "http://s.music.so.com/s?q=%s&c=%s"
+SEARCH_BAIDU_URL  = "http://music.baidu.com/search/song?key=%s"
+SEARCH_360_URL    = "http://s.music.so.com/s?q=%s&c=%s"
+SEARCH_SOUGOU_URL = "http://mp3.sogou.com/music.so?query=%s"
+SEARCH_QQ_URL     = "http://soso.music.qq.com/fcgi-bin/multiple_music_search.fcg?p=1&catZhida=1&lossless=0&t=100&utf8=1&w=%s#tab=music|%s"
+SEARCH_SOSO_URL   = "http://cgi.music.soso.com/fcgi-bin/m.q?w=%s"
+SEARCH_SINA_URL   = "http://music.sina.com.cn/yueku/search_new.php?type=song&key=%s"
 #-----------变量相关----------------#
-TYPE_LIST = ['baidu','kuwo','xiami','kugou','1ting']
+TYPE_LIST = ['baidu','qq','sougou','soso','sina','kuwo','xiami','kugou','1ting']
 #-----------文件相关----------------#
 #index.css
 INDEX_CSS = CSS_DIR + os.path.sep + 'index.css'

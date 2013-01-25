@@ -2,10 +2,10 @@
 #---------------------------------------------------------------------
 # Copyright (c) 2013 zihuacs, Inc. All Rights Reserved
 #
-# @date 2013-01-15, 19:52:00 
-# @file search_baidu.py
+# @date 2013-01-25, 11:58:00 
+# @file search_sina.py
 # @author zihuacs(zihuacs@qq.com)
-# @brief 抓取百度音乐歌曲检索首页结果，非首页忽略之
+# @brief 抓取新浪音乐歌曲检索首页结果，非首页忽略之
 #--------------------------------------------------------------------- 
 import urllib2
 import time
@@ -13,20 +13,20 @@ from bs4 import BeautifulSoup
 from song_info import *
 from urllib import quote
 
-class SearchBadiu:
+class SearchSina:
 	'''
-	url : http://music.baidu.com/search/song?key=%s
+	url : http://music.sina.com.cn/yueku/search_new.php?type=song&key=%s
 	'''
 	def __init__(self,url):
-		self.song_info = SongInfo('baidu')
+		self.song_info = SongInfo('sina')
 		self.url       = url
 
 		self.temp_init()
+		self.all_num = 0
 	'''
 	临时变量初始化 --- 在查找song_info 中使用
 	'''
 	def temp_init(self):
-		self.all_num        =0
 		self.result         ={'title':'','artist':'','album':'','high':{},'link':{}}
 		self.result['high'] ={'title':[],'artist':[],'album':[]}
 		self.result['link'] ={'title':'','artist':'','album':''}
@@ -75,37 +75,27 @@ class SearchBadiu:
 	result={'title':'...','artist':'...','album':'...','high':{'title':[],'artist':[],'album':[]}}
 	'''
 	def find_song_info(self,tag):
-		
-		if tag.name == 'li' and tag.has_key('class') and tag['class'][0] == 'ui-tab-active' :
-			tab_name = tag.a.string.encode('utf-8').split('(')[0]
-			tab_num  = int(tag.a.string.encode('utf-8').split('(')[1].split(')')[0].replace('+',''))
-			if tab_name in ['歌曲']:
-				self.all_num = tab_num
-				self.song_info.set_all_num(tab_num)
-				return True
+		if tag.name =='div' and tag.has_key('class') and tag['class'] == ['search_A','pt10mlr30']:
+			tab_num = int(tag.span.i.get_text())
+			self.all_num = tab_num
+			self.song_info.set_all_num(tab_num)
+			return True
 
-		if tag.name == 'span' and tag.has_key('class') and tag.has_key('style') and \
-		   tag['class'] in [['song-title'],['singer'],['album-title']]:
-			_string    = tag.get_text().encode('utf-8').strip().replace('\n',' ')
-			_high_list = self.get_high_list(tag.find_all('em'))
-			_a_link    = self.get_link(tag)
-			if tag['class'] == ['song-title']:
-				if tag.a != None:
-					_string = tag.a.get_text().encode('utf-8').strip().replace('\n',' ')
-				self.result['title']          = _string.strip()
-				self.result['high']['title']  = _high_list
-				self.result['link']['title']  = _a_link
+		if self.all_num>0 and tag.name == 'em' and tag.has_key('class') and tag['class'] in [['w190'],['w170']]:
+			
+			_title = tag.a['title'].encode('utf-8')
+			_high_list = self.get_high_list(tag.find_all('span'))
+			_link = tag.a['href'].encode('utf-8')
+
+			if tag['class'] == ['w190']:
+				self.result['title']         = _title
+				self.result['high']['title'] = _high_list
+				self.result['link']['title'] = _link
 				return True
-			if tag['class'] == ['singer']:
-				self.result['artist']         = _string.replace('/',',').replace('\t',' ').replace(' ','')
+			if tag['class'] == ['w170']:
+				self.result['artist']         = _title
 				self.result['high']['artist'] = _high_list
-				self.result['link']['artist']  = _a_link
-
-				return True
-			if tag['class'] == ['album-title']:
-				self.result['album']          = _string.replace("《",' ').replace("》",' ').strip()
-				self.result['high']['album']  = _high_list	
-				self.result['link']['album']  = _a_link
+				self.result['link']['artist'] = _link
 				# 加入一条结果
 				self.song_info.append_result(self.result)
 				# 清空临时变量
@@ -141,17 +131,17 @@ class SearchBadiu:
 '''
 根据url and word return song_info
 '''
-def get_search_baidu_res(url,word):
-	SB = SearchBadiu(url)
-	SB.start(word)
-	badiu_song_info = SB.get_song_info()
-	return badiu_song_info
+def get_search_sina_res(url,word):
+	SA = SearchSina(url)
+	SA.start(word)
+	sina_song_info = SA.get_song_info()
+	return sina_song_info
 
-def test_baidu(url,word):
-	SB = SearchBadiu(url)
-	SB.start(word)
-	SB.show()
+def test_sina(url,word):
+	SA = SearchSina(url)
+	SA.start(word)
+	SA.show()
 
 
-#test_baidu('http://music.baidu.com/search/song?key=%s','因为爱情')
-#get_search_baidu_res('http://music.baidu.com/search/song?key=%s','即刻出发')
+#test_sina('http://music.sina.com.cn/yueku/search_new.php?type=song&key=%s','因为爱情')
+#get_search_sina_res('http://music.sina.com.cn/yueku/search_new.php?type=song&key=%s','即刻出发')

@@ -18,14 +18,15 @@ def show_search_box(qword='',type_list=[],select_type_list=[],func_list=[],func_
 	<br>
 	<form action=index.py method=post>
 	<table id="mytable" cellspacing="0" align="center"> 
-	<caption>
+	<caption_box>
 	search_vs_box
 	<br>
 	'''
 	
-	print "<input type=text name=qword size=50 value=\"%s\" >" % qword 
+	print "<input type=text name=qword size=60 value=\"%s\" >" % qword 
+	print '<input type=submit value="music">'
 	print '<br>'
-
+	
 	for qtype in type_list:
 		print qtype
 		if qtype in select_type_list:
@@ -43,8 +44,8 @@ def show_search_box(qword='',type_list=[],select_type_list=[],func_list=[],func_
 			print "<input type=\"radio\" name=\"func\" value=%s>" % qfunc
 	print '<br>'
 	print '''
-	<input type=submit value="music">
-	</caption>
+	
+	</caption_box>
 	</table>
 	</form>
 	'''
@@ -130,6 +131,18 @@ def show_song_info_table(song_info,qword,post_info):
 	print '</table>'
 
 '''
+show footer
+'''
+def show_footer():
+	print '''
+	<br>
+	<table id="mytable" cellspacing="0" align="center"> 
+	<caption>
+	<a href="https://github.com/zihuacs/search_vs"  target="_blank">source code</a>'
+	</caption>
+	</table>'''
+
+'''
 body.print
 '''
 def show_song_info_list_body(song_info_list,post_info):
@@ -142,6 +155,8 @@ def show_song_info_list_body(song_info_list,post_info):
 	for song_info in song_info_list:
 		show_song_info_table(song_info,qword,post_info)
 
+	show_footer()
+	
 	print '</div>'
 	print '</body>'
 

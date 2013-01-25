@@ -16,6 +16,10 @@ proc_init()
 from conf import *
 from search_baidu import *
 from serach_360 import *
+from search_sougou import *
+from search_qq import *
+from search_soso import *
+from search_sina import *
 from common import *
 from song_info import *
 from pingce import pingce_fun
@@ -28,9 +32,16 @@ import threading
 def get_song_info(song_info_list,qword,qtype):
 	if qtype == 'baidu':
 		song_info_list.append(get_search_baidu_res(SEARCH_BAIDU_URL,qword))
+	elif qtype == 'qq':
+		song_info_list.append(get_search_qq_res(SEARCH_QQ_URL,qword))
+	elif qtype == 'sougou':
+		song_info_list.append(get_search_sougou_res(SEARCH_SOUGOU_URL,qword))
+	elif qtype == 'soso':
+		song_info_list.append(get_search_soso_res(SEARCH_SOSO_URL,qword))
+	elif qtype == 'sina':
+		song_info_list.append(get_search_sina_res(SEARCH_SINA_URL,qword))
 	else:
 		song_info_list.append(get_search_360_res(SEARCH_360_URL,qword,qtype))
-
 
 '''
 以多线程的方式获取结果,并以type_list 进行重排序

@@ -37,6 +37,12 @@ font: bold 18px 'Trebuchet MS', Verdana, Arial, Helvetica, sans-serif;
 text-align: center; 
 } 
 
+caption_box { 
+padding: 3px 3px 6px 6px; 
+width: 600px; 
+font: bold 18px 'Trebuchet MS', Verdana, Arial, Helvetica, sans-serif; 
+text-align: center; 
+} 
 
 th { 
 font: bold 15px 'Trebuchet MS', Verdana, Arial, Helvetica, sans-serif; 
